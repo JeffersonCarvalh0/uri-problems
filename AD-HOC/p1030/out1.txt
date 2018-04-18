@@ -1,0 +1,6 @@
+Case 1: 1
+Case 2: 5981
+Case 3: 1
+Case 4: 10000
+Case 5: 3617
+Case 6: 2692

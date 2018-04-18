@@ -1,0 +1,4 @@
+Case 1: 1000
+Case 2: 4
+Case 3: 11
+Case 4: 514

@@ -1,0 +1,12 @@
+tabuasN: 2
+tabuasM: 1
+impossivel
+tabuasN: 1
+tabuasM: 1
+impossivel
+tabuasN: 0
+tabuasM: 0
+impossivel
+tabuasN: 1
+tabuasM: 0
+impossivel
