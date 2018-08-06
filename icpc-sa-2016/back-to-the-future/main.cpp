@@ -1,5 +1,3 @@
-// Not done yet
-
 # include <iostream>
 # include <vector>
 # include <list>
@@ -8,14 +6,14 @@
 using namespace std;
 
 int main() {
-    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    // ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
     int n, m, a, b, v1, v2, ans;
     set<pair<int, int>> s;
 
-    cin >> n >> m >> a >> b
+    cin >> n >> m >> a >> b;
     vector<list<int>> adj_list(n);
     vector<int> deg(n);
-    ans = 0;
+    vector<bool> inset(n, true);
 
     while (m--) {
         cin >> v1 >> v2; --v1; --v2;
@@ -25,19 +23,35 @@ int main() {
 
     for (int i = 0; i < n; ++i) s.insert({ deg[i], i });
 
-    bool finished = false;
+    bool erased_first, erased_second; erased_first = erased_second = true;
     int cur;
     ans = n;
-    while (!finished && !s.empty()) {
+    while ((erased_first || erased_second) && !s.empty()) {
+        erased_first = false; erased_second = false;
         cur = s.begin()->second;
-        if (adj_list[cur].size() < a || n - (adj_list[cur] + 1) < b) {
-            s.erase(s.begin()); --ans;
-            for (auto adj : adj_list[cur]) --deg[adj], s.erase()
+        if (deg[cur] < a || ans - (deg[cur] + 1) < b) {
+            s.erase(s.begin()); --ans; inset[cur] = false;
+            for (auto adj : adj_list[cur])
+                if (inset[adj]) {
+                    s.erase({ deg[adj], adj });
+                    --deg[adj];
+                    s.insert({ deg[adj], adj });
+                }
+            erased_first = true;
         }
 
-        cur = prev(s.end())->second;
-        if (adj_list[cur].size() < a || n - (adj_list[cur] + 1) < b) {
-            s.erase(prev(s.end())); --ans;
+        if (!s.empty()) {
+            cur = prev(s.end())->second;
+            if (deg[cur] < a || ans - (deg[cur] + 1) < b) {
+                s.erase(prev(s.end())); --ans; inset[cur] = false;
+                for (auto adj : adj_list[cur])
+                    if (inset[adj]) {
+                        s.erase({ deg[adj], adj });
+                        --deg[adj];
+                        s.insert({ deg[adj], adj });
+                    }
+                erased_second = true;
+            }
         }
     }
 
