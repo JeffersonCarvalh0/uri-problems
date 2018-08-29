@@ -1,5 +1,3 @@
-// WA at URI, gives the right answer to every single test case available
-
 # include <iostream>
 # include <cstring>
 
@@ -29,6 +27,7 @@ void dfs(int v) {
 int main() {
     ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
     while (cin >> n >> m >> i) {
+        memset(adj_mat, 0, sizeof(adj_mat));
         for (int c = 0; c < n; ++c) cin >> k[c];
         for (int c = 0; c < m; ++c) cin >> x >> y, adj_mat[--x][--y] = true;
         while (i--) {
