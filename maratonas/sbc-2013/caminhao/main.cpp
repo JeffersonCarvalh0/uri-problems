@@ -1,4 +1,4 @@
-// TLE
+// Not finished yet
 
 # include <iostream>
 # include <algorithm>
@@ -29,6 +29,70 @@ public:
     }
 };
 
+int logs[100005];
+
+class SparseTable {
+public:
+    vector<vector<int>> st;
+    vector<int> &a;
+
+    SparseTable(vector<int> &a): a(a) {
+        int n = a.size();
+        st = vector<vector<int>>(n, vector<int>(logs[n] + 1));
+        for (int i = 0; i < n; ++i) st[i][0] = i;
+        for (int j = 1; j <= logs[n]; ++j) {
+            for (int i = 0; i + (1 << j) <= n; ++i) {
+                if (a[st[i][j - 1]] < a[st[i + (1 << (j - 1))][j - 1]])
+                    st[i][j] = st[i][j - 1];
+                else
+                    st[i][j] = st[i + (1 << (j - 1))][j - 1];
+            }
+        }
+    }
+
+    int query(int l, int r) {
+        if (r < l) swap(l, r);
+        int span = r - l + 1, j = logs[span];
+        if (a[st[l][j]] < a[st[l + span - (1 << j)][j]])
+            return st[l][j];
+        else
+            return st[l + span - (1 << j)][j];
+    }
+};
+
+class LCA {
+public:
+    vector<int> euler, dists, first;
+    vector<bool> visited;
+
+    LCA(vector<list<pair<int, int>>> &adj_list) {
+        first.resize(adj_list.size());
+        visited.resize(adj_list.size(), false);
+        dfs(0, 1e6, adj_list);
+
+        for (auto &e : euler) cout << e << ' ';
+        cout << '\n';
+        for (auto &e : dists) cout << e << ' ';
+        cout << '\n';
+        for (auto &e : first) cout << e << ' ';
+        cout << '\n';
+    }
+
+    void dfs(int v, int d, vector<list<pair<int, int>>> &adj_list) {
+        visited[v] = true;
+        first[v] = euler.size(); euler.push_back(v); dists.push_back(d);
+
+        for (auto &adj : adj_list[v]) {
+            if (!visited[adj.first])
+                dfs(adj.first, adj.second, adj_list), euler.push_back(v), dists.push_back(d);
+        }
+    }
+
+    int query(int v1, int v2, SparseTable st) {
+        return dists[st.query(first[v1], first[v2])];
+    }
+};
+
 struct Edge {
     int v1, v2, w;
     Edge(int v1 = 0, int v2 = 0, int w = 0): v1(v1), v2(v2), w(w) {}
@@ -47,40 +111,14 @@ vector<Edge> kruskal(vector<Edge> &edges, int n) {
     return ans;
 }
 
-int dfs(vector<list<pair<int, int>>> &adj_list, int a, int b) {
-    stack<pair<int, int>> s;
-    vector<bool> visited(adj_list.size(), false);
-    vector<pair<int, int>> parents(adj_list.size());
-    int min_weight = 1e6;
-
-    for (int i = 0; i < parents.size(); ++i) parents[i] = { i, 1e6 };
-    s.push({ a, 1e6 });
-
-    while (!s.empty()) {
-        auto cur = s.top(); s.pop();
-        visited[cur.first] = true;
-        if (cur.first == b) break;
-
-        for (auto &e : adj_list[cur.first])
-            if (!visited[e.first])
-                s.push(e), parents[e.first] = { cur.first, e.second };
-    }
-
-    int v = b;
-    while (parents[v].first != v) {
-        int w = parents[v].second;
-        v = parents[v].first;
-        min_weight = min(min_weight, w);
-    }
-
-    return min_weight;
-}
-
 int main() {
     ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
     vector<Edge> edges;
     vector<list<pair<int, int>>> adj_list;
     int n, m, s, a, b, p;
+
+    logs[1] = 0;
+    for (int i = 2; i < 100005; ++i) logs[i] = logs[i/2] + 1;
 
     while (cin >> n >> m >> s) {
         edges.clear();
@@ -94,7 +132,14 @@ int main() {
         for (auto &e : tree)
             adj_list[e.v1].push_back({ e.v2, e.w }), adj_list[e.v2].push_back({ e.v1, e.w });
 
-        while (s--) cin >> a >> b, cout << dfs(adj_list, --a, --b) << '\n';
+        for (int i = 0; i < adj_list.size(); ++i)
+            for (auto &e : adj_list[i])
+                cout << i << ' ' <<  e.first << ' ' << e.second << '\n';
+
+        LCA lca(adj_list);
+        SparseTable st(lca.dists);
+
+        while (s--) cin >> a >> b, cout << lca.query(--a, --b, st) << '\n';
     }
 
     return 0;
