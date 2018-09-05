@@ -1,5 +1,3 @@
-// Not finished yet
-
 # include <iostream>
 # include <algorithm>
 # include <stack>
@@ -62,34 +60,29 @@ public:
 
 class LCA {
 public:
-    vector<int> euler, dists, first;
+    vector<int> euler, heights, first, parents;
     vector<bool> visited;
 
     LCA(vector<list<pair<int, int>>> &adj_list) {
-        first.resize(adj_list.size());
-        visited.resize(adj_list.size(), false);
-        dfs(0, 1e6, adj_list);
+        int n = adj_list.size();
 
-        for (auto &e : euler) cout << e << ' ';
-        cout << '\n';
-        for (auto &e : dists) cout << e << ' ';
-        cout << '\n';
-        for (auto &e : first) cout << e << ' ';
-        cout << '\n';
+        first.resize(n); visited.resize(n, false); parents.resize(n);
+        euler.reserve(n * 2 - 1); heights.reserve(n * 2 - 1);
+        dfs(0, 0, 1, adj_list);
     }
 
-    void dfs(int v, int d, vector<list<pair<int, int>>> &adj_list) {
-        visited[v] = true;
-        first[v] = euler.size(); euler.push_back(v); dists.push_back(d);
+    void dfs(int v, int p, int h, vector<list<pair<int, int>>> &adj_list) {
+        visited[v] = true; parents[v] = p; first[v] = euler.size();
+        euler.push_back(v); heights.push_back(h);
 
         for (auto &adj : adj_list[v]) {
             if (!visited[adj.first])
-                dfs(adj.first, adj.second, adj_list), euler.push_back(v), dists.push_back(d);
+                dfs(adj.first, v, h + 1, adj_list), euler.push_back(v), heights.push_back(h);
         }
     }
 
-    int query(int v1, int v2, SparseTable st) {
-        return dists[st.query(first[v1], first[v2])];
+    int query(int v1, int v2, SparseTable &st) {
+        return euler[st.query(first[v1], first[v2])];
     }
 };
 
@@ -109,6 +102,22 @@ vector<Edge> kruskal(vector<Edge> &edges, int n) {
     }
 
     return ans;
+}
+
+int find_min(vector<list<pair<int, int>>> &adj_list, vector<int> &parents, int a, int b, int l) {
+    int min_weight = 1e6, v;
+
+    v = a;
+    while (v != l)
+        for (auto &e : adj_list[v])
+            if (e.first == parents[v]) { min_weight = min(min_weight, e.second); v = e.first; break; }
+
+    v = b;
+    while (v != l)
+        for (auto &e : adj_list[v])
+            if (e.first == parents[v]) { min_weight = min(min_weight, e.second); v = e.first; break; }
+
+    return min_weight;
 }
 
 int main() {
@@ -132,14 +141,14 @@ int main() {
         for (auto &e : tree)
             adj_list[e.v1].push_back({ e.v2, e.w }), adj_list[e.v2].push_back({ e.v1, e.w });
 
-        for (int i = 0; i < adj_list.size(); ++i)
-            for (auto &e : adj_list[i])
-                cout << i << ' ' <<  e.first << ' ' << e.second << '\n';
-
         LCA lca(adj_list);
-        SparseTable st(lca.dists);
+        SparseTable st(lca.heights);
 
-        while (s--) cin >> a >> b, cout << lca.query(--a, --b, st) << '\n';
+        while (s--) {
+            cin >> a >> b;
+            int l = lca.query(--a, --b, st);
+            cout << find_min(adj_list, lca.parents, a, b, l) << '\n';
+        }
     }
 
     return 0;
