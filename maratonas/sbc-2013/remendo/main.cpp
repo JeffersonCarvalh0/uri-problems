@@ -1,8 +1,7 @@
-// Not finished yet
+// WA
 
 # include <iostream>
 # include <vector>
-# include <list>
 # include <cstring>
 # include <bitset>
 
@@ -16,11 +15,10 @@ int main() {
     ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
     int n, c, t1, t2, first, last, cur, sum;
     vector<pair<int, int>> dp;
-    list<pair<int, int>> patches;
     dp.reserve(MAXC);
 
     while (cin >> n >> c >> t1 >> t2) {
-        holes.reset(); dp.clear(); patches.clear();
+        holes.reset(); dp.clear();
 
         cin >> first;
         holes[0] = true;
@@ -41,19 +39,17 @@ int main() {
 
         for (int i = 0; i <= last; ++i) {
             if (holes[i]) {
-                if (i < t2 || (i >= t2 && t2 > dp[i].second)) patches.push_back({ dp[i].first, t1 });
-                else {
-                    dp[i] = { i - t2, t2 };
-                    auto it = patches.begin();
-                    for (; it != patches.end(); ++it) if (it->first >= i - t2) break;
-                    patches.erase(it, patches.end());
-                    patches.push_back(dp[i]);
-                }
+                if (i >= t2 && holes[i - t2]) dp[i - t2] = { i - t2, t2 };
+                else dp[i] = { dp[i].first, t1 };
             }
         }
 
         sum = 0;
-        for (auto &e : patches) sum += e.second;
+        for (int i = 0; i <= last;) {
+            if (i == dp[i].first) sum += dp[i].second, i += dp[i].second + 1;
+            else ++i;
+        }
+
         cout << sum << '\n';
     }
 
