@@ -1,36 +1,48 @@
-// WA 20%
-
 # include <iostream>
 # include <iomanip>
 # include <cmath>
 
 using namespace std;
 
-struct Flipper {
-    double yi, xf, yf;
-    Flipper(double yi = 0, double xf = 0, double yf = 0): yi(yi), xf(xf), yf(yf) {}
+struct Point {
+    double x, y;
+    Point(double x = 0, double y = 0): x(x), y(y) {}
 };
 
+struct Flipper {
+    double y;
+    Point f;
+    Flipper(double yi = 0, double xf = 0, double yf = 0): y(yi) { f = Point(xf, yf); }
+};
+
+inline double dot(Point &v1, Point &v2) { return (v1.x * v2.x) + (v1.y * v2.y); }
+inline double cross(Point &v1, Point &v2) { return (v1.x * v2.y) - (v1.y * v2.x); }
+
 double dist(Flipper *flippers, int i, double l) {
-    pair<double, double> a, b, c, ab, ac;
+    Point a, b, c, ab, bc, ba, ac;
 
-    if ((i + 1) & 1) a.first = 0;
-    else a.first = l;
-    a.second = flippers[i + 1].yi;
+    if ((i + 1) & 1) a.x = 0;
+    else a.x = l;
+    a.y = flippers[i + 1].y;
 
-    b.first = flippers[i + 1].xf;
-    b.second = flippers[i + 1].yf;
+    b = flippers[i + 1].f;
+    c = flippers[i].f;
 
-    c.first = flippers[i].xf;
-    c.second = flippers[i].yf;
+    ab.x = b.x - a.x;
+    ab.y = b.y - a.y;
 
-    ab.first = b.first - a.first;
-    ab.second = b.second - a.second;
+    bc.x = c.x - b.x;
+    bc.y = c.y - b.y;
 
-    ac.first = c.first - a.first;
-    ac.second = c.second - a.second;
+    ba.x = a.x - b.x;
+    ba.y = a.y - b.y;
 
-    return (ab.first * ac.second) - (ab.second * ac.first) / sqrt((ab.first * ab.first) + (ab.second * ab.second));
+    ac.x = c.x - a.x;
+    ac.y = c.y - a.y;
+
+    if (dot(ab, bc) > 0) return hypot(b.x - c.x, b.y - c.y);
+    else if (dot(ba, ac) > 0) return hypot(a.x - c.x, a.y - c.y);
+    else return cross(ab, ac) / hypot(ab.x, ab.y);
 }
 
 int main() {
@@ -45,8 +57,8 @@ int main() {
 
         ans = 1005;
         for (int i = 1; i <= n; ++i) {
-            if (i & 1) cur_min = l - flippers[i].xf;
-            else cur_min = flippers[i].xf;
+            if (i & 1) cur_min = l - flippers[i].f.x;
+            else cur_min = flippers[i].f.x;
 
             if (i <= n - 1)
                 cur_min = min(cur_min, abs(dist(flippers, i, l)));
