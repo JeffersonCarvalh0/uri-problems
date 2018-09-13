@@ -23,7 +23,6 @@ int main() {
 
     for (int i = m; i <= n; ++i) ans += dp[i][t];
 
-    cout << ans << '\n';
     cout << ans % MOD << '\n';
 
     return 0;
