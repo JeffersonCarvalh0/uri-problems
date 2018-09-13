@@ -4,7 +4,7 @@
 
 using namespace std;
 
-# define MOD 1000000007
+# define MOD 1000000007LL
 
 typedef long long ll;
 
@@ -19,11 +19,11 @@ int main() {
     for (int i = m; i <= n; ++i) dp[i][1] = 1;
     for (int j = 2; j <= t; ++j)
         for (int i = m; i <= n; ++i)
-            dp[i][j] = dp[i - 1][j - 1] + dp[i + 1][j - 1];
+            dp[i][j] = (dp[i - 1][j - 1] + dp[i + 1][j - 1]) % MOD;
 
-    for (int i = m; i <= n; ++i) ans += dp[i][t];
+    for (int i = m; i <= n; ++i) ans += dp[i][t] % MOD;
 
-    cout << ans % MOD << '\n';
+    cout << ans << '\n';
 
     return 0;
 }
