@@ -1,5 +1,3 @@
-// WA
-
 # include <iostream>
 
 using namespace std;
@@ -23,7 +21,7 @@ int main() {
 
     for (int i = m; i <= n; ++i) ans += dp[i][t] % MOD;
 
-    cout << ans << '\n';
+    cout << ans % MOD << '\n';
 
     return 0;
 }
