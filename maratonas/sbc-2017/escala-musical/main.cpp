@@ -1,5 +1,3 @@
-// 5% WA
-
 # include <iostream>
 # include <algorithm>
 # include <set>
@@ -21,7 +19,7 @@ Notes sol[7] = { Sol, La, Si, Do, Re, Mi, Fas };
 Notes sols[7] = { Sols, Las, Do, Dos, Res, Fa, Sol };
 Notes la[7] = { La, Si, Dos, Re, Mi, Fas, Sols };
 Notes las[7] = { Las, Do, Re, Res, Fa, Sol, La };
-Notes si[7] = { Dos, Res, Mi, Fas, Sols, Las };
+Notes si[7] = { Si, Dos, Res, Mi, Fas, Sols, Las };
 
 inline bool check_tune(set<Notes> &song, int n, Notes *scale) {
     for (auto &note : song)
