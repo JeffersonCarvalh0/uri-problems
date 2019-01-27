@@ -15,7 +15,7 @@ int main() {
         int edges = 0; // Número de arestas
         memset(adj_mat, false, sizeof(adj_mat)); // Coloca falso pra todas as posições da matriz
         cin >> n >> v >> a; // Recebe o vértice inicial, número de vértices e número de arestas
-        while (a--) { // Enquanto houverem vértices
+        while (a--) { // Enquanto houverem arestas
             cin >> v1 >> v2; // Recebe os valores dos dois vértices que compõem a aresta
             if (!adj_mat[v1][v2]) { // Se a aresta NÃO existir
                 adj_mat[v1][v2] = true; // Aresta que vai de v1 à v2 agora existe
